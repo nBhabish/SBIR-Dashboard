@@ -31,7 +31,7 @@ ui <- navbarPage(
   collapsible = TRUE,
   
   tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = shinytheme("sandstone")),
+    tags$link(rel = "stylesheet", type = "text/css", href = shinytheme("united")),
     # tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
   ),
   # JS ----
@@ -50,8 +50,6 @@ ui <- navbarPage(
       class = "container",
       id    = "header",
       h1(class = "page-header", "Federal Research and Development", tags$small("Spending Dashboard")),
-      p(class = "lead", "",
-        a(class = "btn btn-primary", href = "#", target = "_blank", "Learn more about it here")),
     ),
     
     # div(
@@ -106,12 +104,11 @@ ui <- navbarPage(
                class = "well",
                h4("About the SBIR"),
                id = "lorem_ipsum",
-               p(class = "lead", 
+               p( 
                  tags$small("The Small Business Innovation Research (SBIR) programs is a competitive program that encourages small 
                  businesses to engage in Federal Research/Research and Development (R/R&D) with the
                  potential for commercialization. Through a competitive awards-based program, SBIR awards 
-                 enable small businesses to explore their technological potential and provide the incentive to profit from its commercialization.
-                 See https://www.sbir.gov/about for more information."))
+                 enable small businesses to explore their technological potential and provide the incentive to profit from its commercialization.")),
              )
              
       ),
@@ -124,7 +121,6 @@ ui <- navbarPage(
                div(class = "panel-body",
                    style = "padding: 20px;",
                    plotlyOutput(outputId = "plotly_1"),
-                   h5("Map goes here"))
              )
       )
     ),
@@ -136,12 +132,9 @@ ui <- navbarPage(
         width = 12,
         div(
           class = "panel",
-          div(class = "panel-header", h5("About SGP"),
-              style = "padding: 20px;"),
-          div(class = "panel-body",
-              p(class = "lead", 
-                "Something goes here properly"))
-          
+          p(class = "lead", "",
+            a(class = "btn btn-primary btn-sm", href = "https://www.sbir.gov/about", target = "_blank", "About SBIR"))
+          ),
         )
       )
     )
@@ -151,9 +144,7 @@ ui <- navbarPage(
     div(
       class = "container",
       id    = "header",
-      h1(class = "page-header", "Federal Research and Development", tags$small("Spending Analyzer")),
-      p(class = "lead", "Placeholder for some text",
-        a(class = "btn btn-primary", href = "#", target = "_blank", "Learn more about it here")),
+      h1(class = "page-header", "Federal Research and Development", tags$small("Spending Dashboard")),
     ),
     
     title = "Insights on Phase Awards",
@@ -185,8 +176,31 @@ ui <- navbarPage(
                           actionButton(inputId = "reset_1", label = "Reset", icon = icon("sync"))
                         )
                       )
+                    ),
+                    div(
+                      class = "well",
+                      h4("About the SBIR"),
+                      id = "lorem_ipsum",
+                      p( 
+                        tags$small("The Small Business Innovation Research (SBIR) programs is a competitive program that encourages small 
+                 businesses to engage in Federal Research/Research and Development (R/R&D) with the
+                 potential for commercialization. Through a competitive awards-based program, SBIR awards 
+                 enable small businesses to explore their technological potential and provide the incentive to profit from its commercialization.")),
+                    ),
+                    div(
+                      class = "container",
+                      id    = "About the project",
+                      column(
+                        width = 12,
+                        div(
+                          class = "panel",
+                          p(class = "lead", "",
+                            a(class = "btn btn-primary btn-sm", href = "https://www.sbir.gov/about", target = "_blank", "About SBIR"))
+                        ),
+                      )
                     )
              ),
+             
              column(width = 8,
                     div(
                       class = "panel",
@@ -206,8 +220,9 @@ ui <- navbarPage(
                             )
                           )
                           
-                    )
-             )
+                    )             
+              ),
+             
            )
         )
   
