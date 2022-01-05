@@ -20,7 +20,7 @@ The Small Business Innovation Research (SBIR) programs is a competitive program 
 
 ## Usage
 
-Clone the repo and install all the required dependencies from [required_packages.R](00_scripts/required_packages.R) script, and run the [SBIR-Dashboard.R](SBIR-Dashboard.R) to get the dashboard up and runnning. 
+Clone the repo and install all the required dependencies from [required_packages.R](00_scripts/required_packages.R) script, and run the [SBIR_Dashboard.R](SBIR_Dashboard.R) to get the dashboard up and runnning. 
 
 
 ## Session Info
