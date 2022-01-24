@@ -18,6 +18,15 @@ The Small Business Innovation Research (SBIR) programs is a competitive program 
 
 ![sbir-dash-1.gif](sbir-dash-1.gif)
 
+- Update: January 20, 2021: The outlook of the dashboard has been slightly modified, and below is the new outlook:
+
+- Landing page: 
+
+<img src = "01_plots/landing_page.png">
+
+- Awards page:
+<img src = "01_plots/awards_page.png">
+
 ## Usage
 
 Clone the repo and install all the required dependencies from [required_packages.R](00_scripts/required_packages.R) script, and run the [SBIR_Dashboard.R](SBIR_Dashboard.R) to get the dashboard up and runnning. 
