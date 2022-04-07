@@ -1,5 +1,5 @@
 # SBIR-Dashboard
-> Small Business Innovation Research Dashboard
+> [Small Business Innovation Research Dashboard](https://bhabishya-neupane.shinyapps.io/SBIR-Dashboard/)
 
 
 ### Table of Contents
@@ -12,20 +12,9 @@
 
 ## Description
 
+Link: [SBIR Dashboard](https://bhabishya-neupane.shinyapps.io/SBIR-Dashboard/)
+
 The Small Business Innovation Research (SBIR) programs is a competitive program that encourages small businesses to engage in Federal Research/Research and Development (R/R&D) with the potential for commercialization. Through a competitive awards-based program, SBIR awards enable small businesses to explore their technological potential and provide the incentive to profit from its commercialization.
-
-## Dashboard
-
-![sbir-dash-1.gif](sbir-dash-1.gif)
-
-- Update: January 20, 2021: The outlook of the dashboard has been slightly modified, and below is the new outlook:
-
-- Landing page: 
-
-<img src = "01_plots/landing_page.png">
-
-- Awards page:
-<img src = "01_plots/awards_page.png">
 
 ## Usage
 
