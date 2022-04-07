@@ -1,38 +1,61 @@
-# Libraries ----
-
-library(shiny)
-library(shinyWidgets)
-library(shinythemes)
-library(shinyjs)
-
-library(plotly)
-library(tidyquant)
-library(tidyverse)
 
 
-library(bslib)
-library(thematic)
+# Libraries ---------------------------------------------------------------
+
+
+
+library(shiny) # Web Application Framework for R
+library(shinyWidgets) # Custom Inputs Widgets for Shiny
+library(shinythemes) # Themes for Shiny
+library(shinyjs) # Easily Improve the User Experience of Your Shiny Apps in Seconds
+
+library(plotly) # Create Interactive Web Graphics via 'plotly.js'
+library(tidyquant) # Tidy Quantitative Financial Analysis
+library(tidyverse) # Easily Install and Load the 'Tidyverse'
+
+
+library(bslib) # Custom 'Bootstrap' 'Sass' Themes for 'shiny' and 'rmarkdown'
+library(thematic) # Unified and Automatic 'Theming' of 'ggplot2', 'lattice', and 'base' R Graphics
+
+
+library(leaflet) # Create Interactive Web Maps with the JavaScript 'Leaflet' Library
+library(sf) # Simple Features for R
+
+
+
+
+# Theming -----------------------------------------------------------------
+
+
 
 shinyOptions(bootstrapLib = TRUE)
 thematic::thematic_shiny(font = "auto")
 
 my_theme <- bslib::bs_theme(
   version    = 4,
-  bootswatch = "materia",
-  fg         = "#1C3516",
+  bootswatch = "united",
+  fg         = "black",
   bg         = "white",
-  base_font  = font_google("Acme"),
-  heading_font = font_google("Acme"),
+  primary    = "#E41C38",
+  secondary  = "#E41C38",
+  base_font  = font_google("Harmattan"),
+  heading_font = font_google("Harmattan"),
   font_scale  = 0.95
 )
 
-# Reading in the data ----
+
+# Loading Data ------------------------------------------------------------
 
 military_tbl_formatted <-
   read_csv("00_data/military_spending_formatted.csv")
 
 
-# Quick Function ----
+us_shp_file <-
+  read_sf("00_data/cb_2018_us_state_20m/cb_2018_us_state_20m.shp") %>%
+  janitor::clean_names()
+
+
+# Function for reversing legend -------------------------------------------
 
 reverse_legend_labels <- function(plotly_plot) {
   n_labels <- length(plotly_plot$x$data)
@@ -40,7 +63,8 @@ reverse_legend_labels <- function(plotly_plot) {
   plotly_plot
 }
 
-#  UI ----
+
+# USER INTERFACE ----------------------------------------------------------
 
 ui <- navbarPage(
   title = "Small Business Innovation Research Awards",
@@ -53,13 +77,12 @@ ui <- navbarPage(
   ),
   
   
+  
   shinyjs::useShinyjs(),
   
-  # Application UI ----
+  # Tab Panel 1 -------------------------------------------------------------
   
-  # * Input Section -----
   
-  # TabPanel 1 ----
   tabPanel(
     title = "State Analysis",
     
@@ -70,102 +93,113 @@ ui <- navbarPage(
         class = "page-header",
         "Federal Research and Development",
         tags$small("Spending Dashboard")
-      ),
+      )
     ),
     
-    div(
-      class = "container",
-      id    = "application_ui",
-      fluidRow(
-        column(
-          width = 3,
-          wellPanel(
-            div(
-              id = "main_input",
-              pickerInput(
-                inputId = "picker_year_1",
-                label   = "Year",
-                choices = unique(military_tbl_formatted$date),
-                multiple = FALSE,
-                selected = 2010,
-                option   = pickerOptions(
-                  actionsBox = FALSE,
-                  liveSearch = TRUE,
-                  size       = 5
+    div(class = "container",
+        id    = "application_ui",
+        fluidRow(
+          column(
+            width = 3,
+            wellPanel(
+              # * Input Buttons ---------------------------------------------------------
+              
+              
+              div(
+                id = "main_input",
+                pickerInput(
+                  inputId = "picker_year_1",
+                  label   = "Year",
+                  choices = unique(military_tbl_formatted$date),
+                  multiple = FALSE,
+                  selected = 2010,
+                  option   = pickerOptions(
+                    actionsBox = FALSE,
+                    liveSearch = TRUE,
+                    size       = 5
+                  )
+                ),
+                pickerInput(
+                  inputId = "picker_organization_1",
+                  label   = "Organizations",
+                  choices = unique(military_tbl_formatted$organization),
+                  selected = "Department of Agriculture",
+                  multiple = FALSE,
+                  options = pickerOptions(
+                    actionsBox = FALSE,
+                    liveSearch = TRUE,
+                    size       = 5
+                  )
                 )
               ),
-              pickerInput(
-                inputId = "picker_organization_1",
-                label   = "Organizations",
-                choices = unique(military_tbl_formatted$organization),
-                selected = "Department of Agriculture",
-                multiple = FALSE,
-                options = pickerOptions(
-                  actionsBox = FALSE,
-                  liveSearch = TRUE,
-                  size       = 5
+              
+              
+              # * Apply and Reset Buttons -----------------------------------------------
+              
+              
+              div(
+                id = "input_buttons",
+                actionButton(
+                  inputId = "apply",
+                  label = "Apply",
+                  icon = icon("play")
+                ),
+                div(
+                  class = "pull-right",
+                  actionButton(
+                    inputId = "reset",
+                    label = "Reset",
+                    icon = icon("sync")
+                  )
                 )
               )
             ),
+            
+            br(),
+            br(),
+            
             div(
-              id = "input_buttons",
-              actionButton(
-                inputId = "apply",
-                label = "Apply",
-                icon = icon("play")
-              ),
-              div(
-                class = "pull-right",
-                actionButton(
-                  inputId = "reset",
-                  label = "Reset",
-                  icon = icon("sync")
-                )
-              )
-            )
-          ),
-          
-          br(),
-          br(),
-          
-          div(
-            class = "well",
-            h4("About the SBIR"),
-            id = "lorem_ipsum",
-            p(
-              tags$small(
-                "The Small Business Innovation Research (SBIR) programs is a competitive program that encourages small
+              class = "well",
+              h4("About the SBIR"),
+              id = "lorem_ipsum",
+              p(
+                tags$small(
+                  "The Small Business Innovation Research (SBIR) programs is a competitive program that encourages small
                  businesses to engage in Federal Research/Research and Development (R/R&D) with the
                  potential for commercialization. Through a competitive awards-based program, SBIR awards
                  enable small businesses to explore their technological potential and provide the incentive to profit from its commercialization.",
-                a(
-                  class = "btn btn-primary btn-sm",
-                  href = "https://www.sbir.gov/about",
-                  target = "_blank",
-                  "Learn More"
+                  a(
+                    class = "btn btn-primary btn-sm",
+                    href = "https://www.sbir.gov/about",
+                    target = "_blank",
+                    "Learn More"
+                  )
                 )
               )
-            ),
-          )
-          
-        ),
-        column(width = 9,
-               div(
-                 class = "panel",
+            )
+            
+          ),
+          column(width = 9,
                  div(
-                   class = "panel-header",
-                   style = "padding: 20px;",
-                   h3("Spending Across States")
-                 ),
-                 div(
-                   class = "panel-body",
-                   style = "padding: 20px;",
-                   plotlyOutput(outputId = "plotly_1"),
-                 )
-               ))
-      )
-    )
+                   class = "panel",
+                   div(
+                     class = "panel-header",
+                     style = "padding: 20px;",
+                     h3("Spending Across States")
+                   ),
+                   div(
+                     class = "panel-body",
+                     style = "padding: 20px;",
+                     leafletOutput(outputId = "us_map")
+                   )
+                 ))
+        ))
   ),
+  
+  
+  # Tab Panel 2 -------------------------------------------------------------
+  
+  
   tabPanel(
     div(
       class = "container",
@@ -174,108 +208,130 @@ ui <- navbarPage(
         class = "page-header",
         "Federal Research and Development",
         tags$small("Spending Dashboard")
-      ),
+      )
     ),
-    
-    
-    # Phase Awards ----
     
     title = "Insights on Phase Awards",
     
-    div(
-      class = "container",
-      id    = "application_ui",
-      fluidRow(
-        column(
-          width = 3,
-          wellPanel(div(
-            id = "main_input",
-            pickerInput(
-              inputId = "picker_year_2",
-              label   = "Year",
-              choices = unique(military_tbl_formatted$date),
-              multiple = TRUE,
-              selected = 2010,
-              option   = pickerOptions(
-                actionsBox = FALSE,
-                liveSearch = TRUE,
-                size       = 5
-              )
-            ),
-            div(
-              id = "input_buttons",
-              actionButton(
-                inputId = "apply_1",
-                label = "Apply",
-                icon = icon("play")
-              ),
-              div(
-                class = "pull-right",
-                actionButton(
-                  inputId = "reset_1",
-                  label = "Reset",
-                  icon = icon("sync")
+    
+    
+    # * Input Buttons ---------------------------------------------------------
+    
+    
+    div(class = "container",
+        id    = "application_ui",
+        fluidRow(
+          column(
+            width = 3,
+            wellPanel(div(
+              id = "main_input",
+              pickerInput(
+                inputId = "picker_year_2",
+                label   = "Year",
+                choices = unique(military_tbl_formatted$date),
+                multiple = TRUE,
+                selected = 2010,
+                option   = pickerOptions(
+                  actionsBox = FALSE,
+                  liveSearch = TRUE,
+                  size       = 5
                 )
               ),
               
-            )
-          )),
-          
-          # Line breaks ----
-          br(),
-          br(),
-          
-          div(
-            class = "well",
-            h4("About the SBIR"),
-            id = "lorem_ipsum",
-            p(
-              tags$small(
-                "The Small Business Innovation Research (SBIR) programs is a competitive program that encourages small
+              
+              # * Apply and Reset Buttons -----------------------------------------------
+              
+              
+              div(
+                id = "input_buttons",
+                actionButton(
+                  inputId = "apply_1",
+                  label = "Apply",
+                  icon = icon("play")
+                ),
+                div(
+                  class = "pull-right",
+                  actionButton(
+                    inputId = "reset_1",
+                    label = "Reset",
+                    icon = icon("sync")
+                  )
+                )
+              )
+            )),
+            
+            
+            
+            # * Line Breaks -----------------------------------------------------------
+            
+            
+            
+            
+            br(),
+            br(),
+            
+            
+            
+            # * About The Project Panel-Box -------------------------------------------
+            
+            
+            div(
+              class = "well",
+              h4("About the SBIR"),
+              id = "lorem_ipsum",
+              p(
+                tags$small(
+                  "The Small Business Innovation Research (SBIR) programs is a competitive program that encourages small
                  businesses to engage in Federal Research/Research and Development (R/R&D) with the
                  potential for commercialization. Through a competitive awards-based program, SBIR awards
                  enable small businesses to explore their technological potential and provide the incentive to profit from its commercialization.",
-                a(
-                  class = "btn btn-primary btn-sm",
-                  href = "https://www.sbir.gov/about",
-                  target = "_blank",
-                  "Learn More"
+                  a(
+                    class = "btn btn-primary btn-sm",
+                    href = "https://www.sbir.gov/about",
+                    target = "_blank",
+                    "Learn More"
+                  )
                 )
               )
-            ),
-          )
-        ),
-        column(width = 9,
-               div(
-                 class = "panel",
+            )
+          ),
+          column(width = 9,
                  div(
-                   class = "panel-body",
-                   style = "padding: 20px;",
-                   tabsetPanel(
-                     type = "pills",
-                     
-                     tabPanel(title = "Phase One Awards",
-                              plotlyOutput(outputId = "plotly_phase_1")),
-                     
-                     tabPanel(title = "Phase Two Awards",
-                              plotlyOutput(outputId = "plotly_phase_2"))
+                   class = "panel",
+                   div(
+                     class = "panel-body",
+                     style = "padding: 20px;",
+                     tabsetPanel(
+                       type = "pills",
+                       
+                       tabPanel(title = "Phase One Awards",
+                                plotlyOutput(outputId = "plotly_phase_1")),
+                       
+                       tabPanel(title = "Phase Two Awards",
+                                plotlyOutput(outputId = "plotly_phase_2"))
+                     )
                    )
-                 )
-                 
-               ))
-      )
-    )
+                   
+                 ))
+        ))
   )
 )
 
-# Server ----
+
+# SERVER ------------------------------------------------------------------
 
 server <- function(input, output, session) {
   # bs_themer()
   
+  
+  # Tab Panel 1  ------------------------------------------------------------
+  
+  
+  # * Reset btn functionality -----------------------------------------------
+  
+  
+  
   observeEvent(eventExpr = input$reset, handlerExpr = {
-   
-    
     updatePickerInput(
       session = session,
       inputId = "picker_year_1",
@@ -293,6 +349,13 @@ server <- function(input, output, session) {
     
   })
   
+  
+  
+  
+  # * Reactive output tbl after input filters -------------------------------
+  
+  
+  
   military_reactive_tbl <-
     eventReactive(
       eventExpr = input$apply,
@@ -307,42 +370,96 @@ server <- function(input, output, session) {
       ignoreNULL = FALSE
     )
   
+  # Leaflet starts here -----------------------------------------------------
   
-  military_map_plot_tbl <- reactive({
-    military_reactive_tbl() %>%
-      group_by(state) %>%
-      summarise(total_obligation = sum(total_obligation)) %>%
-      ungroup() %>%
-      mutate(
-        label_text = str_glue(
-          "State: {state}
-                               Total Obligation: {scales::dollar(total_obligation)}"
-        )
+  
+  
+  
+  military_tbl_fitered <- eventReactive(
+    eventExpr = input$apply,
+    valueExpr = {
+      military_tbl_formatted %>%
+        filter(organization %in% input$picker_organization_1,
+               date %in% input$picker_year_1)
+      
+    },
+    ignoreNULL = FALSE
+  )
+  
+  
+  # dataset for leaflet -----------------------------------------------------
+  
+  us_shp_1 <- reactive({
+    us_shp_file %>%
+      left_join(military_tbl_fitered(),
+                by = c("stusps" = "state")) %>%
+      mutate(total_obligation_label = scales::dollar(total_obligation))
+  })
+  
+  
+  
+  # leaflet popup -----------------------------------------------------------
+  
+  mappopup <- reactive({
+    paste(
+      "State:",
+      us_shp_1()$stusps,
+      "<br>",
+      "Obligation",
+      ":",
+      us_shp_1()$total_obligation_label,
+      "<br>"
+    )
+  })
+  
+  
+  
+  # leaflet server ----------------------------------------------------------
+  
+  output$us_map <- renderLeaflet({
+    leaflet(us_shp_file) %>%
+      setView(-96, 37.8, 4) %>%
+      addProviderTiles(providers$CartoDB.DarkMatter)
+  })
+  
+  
+  
+  # Observing leafletProxy --------------------------------------------------
+  
+  
+  observe({
+    
+    mappopup_1 <- mappopup()
+    
+    pal <- colorQuantile("Reds", domain = us_shp_1()$total_obligation, n = 10, na.color = "#bdbdbd")
+    
+    leafletProxy("us_map") %>%
+      addPolygons(
+        data = us_shp_1(),
+        weight = 1,
+        smoothFactor = 0.5,
+        color = "white",
+        fillColor = pal(us_shp_1()$total_obligation),
+        # opacity = 1.0,
+        fillOpacity = 1.5,
+        highlight = highlightOptions(
+          weight = 2,
+          color = "#666",
+          fillOpacity = 0.7,
+          bringToFront = TRUE
+        ),
+        popup = mappopup()
       )
-    
   })
   
-  output$plotly_1 <- renderPlotly({
-    military_map_plot_tbl() %>%
-      plot_geo(locationmode = "USA-states") %>%
-      add_trace(
-        z         = ~ total_obligation,
-        locations = ~ state,
-        color     = ~ total_obligation,
-        text      = ~ label_text,
-        colors    = "Greens",
-        span = I(0)
-      ) %>%
-      layout(geo = list(
-        scope = "usa",
-        projection = list(type = "albers usa"),
-        showlakes  = TRUE,
-        lakecolor  = toRGB("white")
-      ))
-    
-  })
+  # leaflet ends here -------------------------------------------------------
   
-  # Inputs for TabPanel 2 ----
+  
+  
+  # Tab Panel 2 -------------------------------------------------------------
+  
+  
+  # * Reset btn functionality -----------------------------------------------
   
   observeEvent(eventExpr = input$reset_1, handlerExpr = {
     updatePickerInput(session = session,
@@ -354,6 +471,11 @@ server <- function(input, output, session) {
     })
     
   })
+  
+  
+  # * Reactive output for phase plots ---------------------------------------
+  
+  
   
   military_phase_plots <-
     eventReactive(
@@ -367,7 +489,10 @@ server <- function(input, output, session) {
       ignoreNULL = FALSE
     )
   
-  # Phase 1 Plot ----
+  
+  # * Phase Plot 1 ----------------------------------------------------------
+  
+  
   
   output$plotly_phase_1 <- renderPlotly({
     g1 <- military_phase_plots() %>%
@@ -384,7 +509,7 @@ server <- function(input, output, session) {
       ggplot(aes(organization, total_phase_one_obligation, fill = date)) +
       geom_col(position = position_dodge(preserve = "single"), aes(text = label_text)) +
       coord_flip() +
-      theme_minimal()+
+      theme_minimal() +
       labs(x = "",
            y = "",
            fill = "") +
@@ -401,7 +526,10 @@ server <- function(input, output, session) {
     
   })
   
-  # Phase 2 Plot ----
+  
+  # * Phase Plot 2 ----------------------------------------------------------
+  
+  
   
   output$plotly_phase_2 <- renderPlotly({
     g2 <- military_phase_plots() %>%
@@ -418,7 +546,7 @@ server <- function(input, output, session) {
       ggplot(aes(organization, total_phase_two_obligation, fill = date)) +
       geom_col(position = position_dodge(preserve = "single"), aes(text = label_text)) +
       coord_flip() +
-      theme_minimal()+
+      theme_minimal() +
       labs(x = "",
            y = "",
            fill = "") +
